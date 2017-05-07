@@ -1,11 +1,14 @@
 package main
 
-import "./enet"
+import (
+	"flag"
+	"log"
+	"time"
 
-import "flag"
-import "log"
+	"github.com/deft-code/go-enet/enet"
+)
+
 import "net"
-import "time"
 
 var address = flag.String("address", "localhost:9998", "The address the server will listen on.")
 

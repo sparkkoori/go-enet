@@ -1,7 +1,6 @@
 package enet
 
 /*
-#cgo LDFLAGS: -lenet
 #include <enet/enet.h>\
 */
 import "C"
