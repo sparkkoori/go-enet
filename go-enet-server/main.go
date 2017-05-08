@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/deft-code/go-enet/enet"
+	"github.com/sparkkoori/go-enet/enet"
 )
 
 import "net"
@@ -29,6 +29,7 @@ func main() {
 		log.Fatalf("Failed to create host: '%s'", err)
 	}
 	defer host.Destroy()
+	log.Printf("Start on: '%s'", addr)
 
 	for {
 		event, err := host.Service(3 * time.Second)
@@ -40,14 +41,14 @@ func main() {
 			continue
 		}
 
-		switch event.Type {
-		case enet.CONNECT:
+		switch event.EventType {
+		case enet.EventTypeConnect:
 			log.Println("new connection: ", event.Data)
-		case enet.DISCONNECT:
+		case enet.EventTypeDisconnect:
 			log.Println("disconnection: ", event.Data)
-		case enet.RECEIVE:
-			log.Println("received: ", event.Packet)
+		case enet.EventTypeReceive:
 			msg := string(event.Packet)
+			log.Println("received: ", msg)
 			switch msg {
 			case "stop":
 				event.Peer.Disconnect(42)
@@ -56,7 +57,7 @@ func main() {
 			case "die":
 				return
 			default:
-				event.Peer.Send(0, event.Packet, enet.RELIABLE)
+				event.Peer.Send(0, event.Packet, enet.FlagReliable)
 			}
 		}
 	}
