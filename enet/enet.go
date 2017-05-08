@@ -8,6 +8,7 @@ import "C"
 
 import "errors"
 
+//Initialize must be called before use enet.
 func Initialize() error {
 	if C.enet_initialize() != C.int(0) {
 		return errors.New("ENet failed to initialize")
@@ -15,6 +16,7 @@ func Initialize() error {
 	return nil
 }
 
+//Deinitialize must be called after use enet.
 func Deinitialize() {
 	C.enet_deinitialize()
 }

@@ -1,56 +1,56 @@
 package enet
 
 /*
-#include <enet/enet.h>\
+#include <enet/enet.h>
 */
 import "C"
 
 import "errors"
 
+//Peer wraps C.ENetPeer.
 type Peer struct {
-	peer *C.ENetPeer
+	raw *C.ENetPeer
 }
 
-// enet_peer_send
-func (peer *Peer) Send(channelID uint8, data []byte, flags Flag) error {
-	c_packet := new_packet(data, flags)
-	defer C.enet_packet_destroy(c_packet)
+//DisconnectNow disconnect forcly.
+func (peer *Peer) DisconnectNow(data uint) {
+	C.enet_peer_disconnect_now(peer.raw, C.enet_uint32(data))
+}
 
-	ret := C.enet_peer_send(peer.peer, C.enet_uint8(channelID), c_packet)
+//Disconnect gently.
+func (peer *Peer) Disconnect(data uint) {
+	C.enet_peer_disconnect(peer.raw, C.enet_uint32(data))
+}
+
+//DisconnectLater disconnect after all queued outgoing packets are sent.
+func (peer *Peer) DisconnectLater(data uint) {
+	C.enet_peer_disconnect_later(peer.raw, C.enet_uint32(data))
+}
+
+//Send packet through a channel.
+func (peer *Peer) Send(channelID uint8, data []byte, flags Flag) error {
+	cpacket := toCPacket(data, flags)
+
+	ret := C.enet_peer_send(peer.raw, C.enet_uint8(channelID), cpacket)
 	if ret < 0 {
 		return errors.New("ENet failed to send packet")
 	}
 	return nil
 }
 
-// enet_peer_receive
+//Receive calls C.enet_peer_receive.
 func (peer *Peer) Receive() ([]byte, uint8) {
-	var channel_id C.enet_uint8 = 0
-	packet := C.enet_peer_receive(peer.peer, &channel_id)
-	return from_packet(packet), uint8(channel_id)
+	var channelID C.enet_uint8
+	packet := C.enet_peer_receive(peer.raw, &channelID)
+	return fromCPacket(packet), uint8(channelID)
 }
 
-// enet_peer_reset
+//Reset calls C.enet_peer_reset.
 func (peer *Peer) Reset() {
-	C.enet_peer_reset(peer.peer)
+	C.enet_peer_reset(peer.raw)
 }
 
-// enet_peer_ping
+//Ping calls C.enet_peer_ping.
 func (peer *Peer) Ping() {
-	C.enet_peer_ping(peer.peer)
-}
-
-// enet_peer_disconnect_now
-func (peer *Peer) DisconnectNow(data uint) {
-	C.enet_peer_disconnect_now(peer.peer, C.enet_uint32(data))
-}
-
-// enet_peer_disconnect
-func (peer *Peer) Disconnect(data uint) {
-	C.enet_peer_disconnect(peer.peer, C.enet_uint32(data))
-}
-
-// enet_peer_disconnect_later
-func (peer *Peer) DisconnectLater(data uint) {
-	C.enet_peer_disconnect_later(peer.peer, C.enet_uint32(data))
+	C.enet_peer_ping(peer.raw)
 }
