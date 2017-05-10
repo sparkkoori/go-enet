@@ -48,7 +48,7 @@ func main() {
 			log.Println("disconnection: ", event.Data)
 		case enet.EventTypeReceive:
 			msg := string(event.Packet)
-			log.Println("received: ", msg)
+			log.Println("received: ", msg, event.Packet)
 			switch msg {
 			case "stop":
 				event.Peer.Disconnect(42)
