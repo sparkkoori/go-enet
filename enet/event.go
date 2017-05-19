@@ -27,7 +27,7 @@ type Event struct {
 func toEvent(cevent *C.ENetEvent) *Event {
 	event := Event{
 		EventType: EventType(cevent._type),
-		Peer:      &Peer{cevent.peer},
+		Peer:      nil,
 		ChannelID: uint8(cevent.channelID),
 		Data:      uint32(cevent.data),
 		Packet:    fromCPacket(cevent.packet),

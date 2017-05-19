@@ -13,6 +13,7 @@ import "unsafe"
 //Host warps C.ENetHost.
 type Host struct {
 	chost *C.ENetHost
+	peers map[*C.ENetPeer]*Peer
 }
 
 //CreateHost use net.UDPAddr instead of C.ENetHost, this address is used for bind.
@@ -33,7 +34,7 @@ func CreateHost(address *net.UDPAddr, peerCount uint, channelLimit uint, incomin
 
 	//Sets the packet compressor the host should use to compress and decompress packets.
 	C.enet_host_compress(chost, nil)
-	return &Host{chost}, nil
+	return &Host{chost, make(map[*C.ENetPeer]*Peer)}, nil
 }
 
 //Destroy it.
@@ -54,7 +55,8 @@ func (host *Host) Connect(address *net.UDPAddr, channelCount uint, data uint) (*
 		return nil, errors.New("no available peers for initiating an ENet connection")
 	}
 
-	peer := &Peer{cpeer}
+	peer := &Peer{cpeer, nil}
+	host.peers[cpeer] = peer
 	return peer, nil
 }
 
@@ -70,7 +72,14 @@ func (host *Host) Service(timeout time.Duration) (*Event, error) {
 	case ret < 0:
 		return nil, errors.New("enet internal error")
 	case ret > 0:
-		return toEvent(&cevent), nil
+		evt := toEvent(&cevent)
+		//recover peer
+		peer := host.peers[cevent.peer]
+		if peer == nil {
+			peer = &Peer{cevent.peer, nil}
+		}
+		evt.Peer = peer
+		return evt, nil
 	default:
 		return nil, nil
 	}

@@ -9,7 +9,18 @@ import "errors"
 
 //Peer wraps C.ENetPeer.
 type Peer struct {
-	raw *C.ENetPeer
+	raw  *C.ENetPeer
+	data interface{}
+}
+
+//SetData ...
+func (peer *Peer) SetData(data interface{}) {
+	peer.data = data
+}
+
+//Data ...
+func (peer *Peer) Data() interface{} {
+	return peer.data
 }
 
 //DisconnectNow disconnect forcly.

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"reflect"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -39,12 +40,6 @@ func TestConvAddr(t *testing.T) {
 }
 
 func TestMainFlow(t *testing.T) {
-	err := Initialize()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer Deinitialize()
-
 	addr, err := net.ResolveUDPAddr("udp", "localhost:9201")
 	if err != nil {
 		t.Fatal(err)
@@ -83,13 +78,16 @@ func TestMainFlow(t *testing.T) {
 			t.Error(err)
 		}
 		if evt == nil || evt.EventType != EventTypeConnect {
-			t.Error(errors.New("client not get connect event"))
+			t.Error(errors.New("client do not get connect event"))
+		}
+		if evt.Peer != peer {
+			t.Error(errors.New("event do not recover peer"))
 		}
 		group.Done()
 	}()
 	group.Wait()
 	if t.Failed() {
-		t.FailNow()
+		runtime.Goexit()
 	}
 
 	//send
@@ -99,10 +97,6 @@ func TestMainFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 	client.Flush()
-
-	server.Destroy()
-	client.Destroy()
-	t.FailNow()
 
 	//send receive
 	var peer2 *Peer
@@ -120,7 +114,7 @@ func TestMainFlow(t *testing.T) {
 	if evt == nil || evt.EventType != EventTypeReceive {
 		t.Fatal(errors.New("server not get receive event"))
 	} else {
-		if reflect.DeepEqual(payload, evt.Packet) {
+		if !reflect.DeepEqual(payload, evt.Packet) {
 			t.Fatal(errors.New("payloads not the same"))
 		}
 		peer2 = evt.Peer
@@ -142,7 +136,7 @@ func TestMainFlow(t *testing.T) {
 	if evt == nil || evt.EventType != EventTypeReceive {
 		t.Fatal(errors.New("client not get receive event"))
 	} else {
-		if reflect.DeepEqual(payload2, evt.Packet) {
+		if !reflect.DeepEqual(payload2, evt.Packet) {
 			t.Fatal(errors.New("payload2 not the same"))
 		}
 	}
