@@ -24,17 +24,17 @@ func (peer *Peer) Data() interface{} {
 }
 
 //DisconnectNow disconnect forcly.
-func (peer *Peer) DisconnectNow(data uint) {
+func (peer *Peer) DisconnectNow(data uint32) {
 	C.enet_peer_disconnect_now(peer.raw, C.enet_uint32(data))
 }
 
 //Disconnect gently.
-func (peer *Peer) Disconnect(data uint) {
+func (peer *Peer) Disconnect(data uint32) {
 	C.enet_peer_disconnect(peer.raw, C.enet_uint32(data))
 }
 
 //DisconnectLater disconnect after all queued outgoing packets are sent.
-func (peer *Peer) DisconnectLater(data uint) {
+func (peer *Peer) DisconnectLater(data uint32) {
 	C.enet_peer_disconnect_later(peer.raw, C.enet_uint32(data))
 }
 

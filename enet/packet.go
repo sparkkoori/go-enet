@@ -8,7 +8,7 @@ import "C"
 import "unsafe"
 
 //A Flag represents a bitmask flag.
-type Flag uint
+type Flag uint32
 
 //Packet delivery flags.
 const (
