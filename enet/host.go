@@ -37,8 +37,8 @@ func CreateHost(address *net.UDPAddr, peerCount uint, channelLimit uint, incomin
 	return &Host{chost, make(map[*C.ENetPeer]*Peer)}, nil
 }
 
-//Destroy it.
-func (host *Host) Destroy() {
+//Close it.
+func (host *Host) Close() {
 	if host != nil && host.chost != nil {
 		C.enet_host_destroy(host.chost)
 		host.chost = nil
@@ -47,7 +47,7 @@ func (host *Host) Destroy() {
 
 //Connect to target host using address, a uint32 data can be carried.
 //There are many channels in one connection.
-func (host *Host) Connect(address *net.UDPAddr, channelCount uint, data uint32) (*Peer, error) {
+func (host *Host) Connect(address *net.UDPAddr, channelCount uint, data uint) (*Peer, error) {
 	caddr := toUDPAddr(address)
 	cpeer := C.enet_host_connect(host.chost, &caddr, C.size_t(channelCount), C.enet_uint32(data))
 

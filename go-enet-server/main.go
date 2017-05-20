@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create host: '%s'", err)
 	}
-	defer host.Destroy()
+	defer host.Close()
 	log.Printf("Start on: '%s'", addr)
 
 	for {

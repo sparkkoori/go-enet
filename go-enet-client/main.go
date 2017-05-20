@@ -27,7 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create host: '%s'", err)
 	}
-	defer host.Destroy()
+	defer host.Close()
 
 	serverAddr, err := net.ResolveUDPAddr("udp", *serverAddress)
 	if err != nil {

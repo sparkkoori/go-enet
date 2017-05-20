@@ -49,12 +49,12 @@ func TestMainFlow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	//defer client.Destroy()
+	defer client.Close()
 	server, err := CreateHost(addr, 32, 2, 0, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
-	//defer server.Destroy()
+	defer server.Close()
 
 	//connect
 	peer, err := client.Connect(addr, 2, 0)
