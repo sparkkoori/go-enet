@@ -107,6 +107,7 @@ func TestMainFlow(t *testing.T) {
 	if evt == nil || evt.EventType != EventTypeConnect {
 		t.Fatal(errors.New("server not get connect event"))
 	}
+	peer2 = evt.Peer
 	evt, err = server.Service(1 * time.Second)
 	if err != nil {
 		t.Fatal(err)
@@ -117,7 +118,9 @@ func TestMainFlow(t *testing.T) {
 		if !reflect.DeepEqual(payload, evt.Packet) {
 			t.Fatal(errors.New("payloads not the same"))
 		}
-		peer2 = evt.Peer
+		if peer2 != evt.Peer {
+			t.Fatal("can't recover peer")
+		}
 	}
 
 	//response
