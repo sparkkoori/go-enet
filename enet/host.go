@@ -77,6 +77,7 @@ func (host *Host) Service(timeout time.Duration) (*Event, error) {
 		peer := host.peers[cevent.peer]
 		if peer == nil {
 			peer = &Peer{cevent.peer, nil}
+			host.peers[cevent.peer] = peer
 		}
 		evt.Peer = peer
 		return evt, nil
